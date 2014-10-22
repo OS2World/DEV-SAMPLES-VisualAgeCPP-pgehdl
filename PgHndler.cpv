@@ -1,0 +1,122 @@
+
+
+// Feature source code generation begins here...
+INotificationId APageHandler::previousPageNumberId = "APageHandler::previousPageNumber";
+INotificationId APageHandler::currentPageNumberId = "APageHandler::currentPageNumber";
+
+INotificationId APageHandler::page1SelectedEventId = "APageHandler::page1SelectedEvent";
+INotificationId APageHandler::page2SelectedEventId = "APageHandler::page2SelectedEvent";
+INotificationId APageHandler::page3SelectedEventId = "APageHandler::page3SelectedEvent";
+INotificationId APageHandler::anyPageSelectedEventId = "APageHandler::anyPageSelectedEvent";
+
+int APageHandler::previousPageNumber() const
+{
+  return iPreviousPageNumber;
+}
+
+APageHandler& APageHandler::setPreviousPageNumber(int aPreviousPageNumber)
+{
+  if (!(iPreviousPageNumber == aPreviousPageNumber))
+  {
+    iPreviousPageNumber = aPreviousPageNumber;
+    notifyObservers(INotificationEvent(APageHandler::previousPageNumberId, *this));
+  } // endif
+  return *this;
+}
+
+int APageHandler::currentPageNumber() const
+{
+  return iCurrentPageNumber;
+}
+
+APageHandler& APageHandler::setCurrentPageNumber(int aCurrentPageNumber)
+{
+  if (!(iCurrentPageNumber == aCurrentPageNumber))
+  {
+
+    ITRACE_DEVELOP(" aCurrentPAgeNumber " + IString(aCurrentPageNumber));
+
+    iCurrentPageNumber = aCurrentPageNumber;
+    notifyObservers(INotificationEvent(APageHandler::currentPageNumberId, *this));
+    notifyObservers(INotificationEvent(APageHandler::anyPageSelectedEventId, *this,
+                                       true, (void*) iCurrentPageNumber ));
+    switch (currentPageNumber()) {
+       case 1:
+          notifyObservers(INotificationEvent(APageHandler::page1SelectedEventId, *this));
+          break;
+
+       case 2:
+          notifyObservers(INotificationEvent(APageHandler::page2SelectedEventId, *this));
+          break;
+
+       case 3:
+          notifyObservers(INotificationEvent(APageHandler::page3SelectedEventId, *this));
+          break;
+
+    } // end switch
+
+  } // endif
+  return *this;
+}
+
+APageHandler& APageHandler::handleFor(INotebook* notebk)
+{
+  nbPageHandler.IPageHandler::handleEventsFor(notebk)  ;
+  return *this;
+}
+
+APageHandler& APageHandler::stopHandleFor(INotebook* notebk)
+{
+  nbPageHandler.IPageHandler::stopHandlingEventsFor(notebk);
+  return *this;
+}
+
+// Feature source code generation ends here.
+
+
+
+// added code starts here ****************
+
+
+Boolean APageHandler::MyPageHandler::select( IPageSelectEvent& pageevent)
+ {
+
+   int bothfound = 0;
+   int i =1;
+   INotebook::Cursor cursor(*(pageevent.notebook()));
+
+  // walk thru all pages in the notebook to find the previous page and the selected page
+
+   for (cursor.setToFirst();cursor.isValid();cursor.setToNext()) {
+
+
+   // find the page number for the previous page
+      if (pageevent.previousSelectedPageHandle() == cursor.current() ){
+         outerPgHandlerNv->setPreviousPageNumber( i );
+         bothfound += 1;
+      }
+
+   // find the page number for the current page
+
+      if (pageevent.pageHandle() == cursor.current()) {
+         outerPgHandlerNv->setCurrentPageNumber( i );
+         bothfound += 1;
+      }
+
+    // if both previous and current page are found, exit the for loop
+
+      if ( bothfound == 2 )
+         break;
+      else
+         i += 1;
+
+    } // end for(cursor)
+
+   return false;   // pass the PM page selected message to the owner chain ,
+                   // just in case there is a handler that wants to process this message
+
+ } //   APageHandler::MyPageHandler::select
+
+
+// added code ends here *************
+

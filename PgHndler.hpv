@@ -1,0 +1,48 @@
+
+// Feature source code generation begins here...
+public:
+  virtual int previousPageNumber() const;
+  virtual APageHandler& setPreviousPageNumber(int aPreviousPageNumber);
+  virtual int currentPageNumber() const;
+  virtual APageHandler& setCurrentPageNumber(int aCurrentPageNumber);
+  APageHandler& handleFor(INotebook* notebk);
+  APageHandler& stopHandleFor(INotebook* notebk);
+
+  static INotificationId previousPageNumberId;
+  static INotificationId currentPageNumberId;
+  static INotificationId page1SelectedEventId;
+  static INotificationId page2SelectedEventId;
+  static INotificationId page3SelectedEventId;
+  static INotificationId anyPageSelectedEventId;
+
+private:
+  int iPreviousPageNumber;
+  int iCurrentPageNumber;
+// Feature source code generation ends here.
+
+//*** added code starts here ******
+
+public:
+  static INotificationId selectedPageTempId;
+
+protected:
+
+  // **** PageHandler nested class *****
+   class MyPageHandler : public IPageHandler  {
+     public:
+       void setOuterPgHandlerNv(APageHandler * nvPageHdler) {
+        outerPgHandlerNv = nvPageHdler;
+        }
+     protected:
+       virtual Boolean select( IPageSelectEvent & event);
+     private:
+       APageHandler* outerPgHandlerNv;
+   };
+
+private:
+
+  MyPageHandler nbPageHandler;
+  void initialize() { nbPageHandler.setOuterPgHandlerNv(this); }
+
+// ** added code stops here **
+

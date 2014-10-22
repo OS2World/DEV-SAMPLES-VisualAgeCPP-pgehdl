@@ -1,0 +1,65 @@
+:TARGET.SUFFIXES
+:DEPENDENCY..cpp .obj .rc .rcx .res 
+:TARGET.all
+:DEPENDENCY.
+.\target.exe
+:RULE..cpp.obj
+:ACTION.Compile::C++ Compiler
+:COMMAND.
+icc.exe -DIC_TRACE_DEVELOP /Ti /Gm /Gd /C %s
+:RULE..rcx.rc
+:ACTION.Compile::Resource Precompile
+:COMMAND.
+icc.exe -c /Pc+ /Pe+ /Pd /I. %s > %|dpfF.rc
+:RULE..rc.res
+:ACTION.Compile::Resource Compiler
+:COMMAND.
+rc.exe -r %s .\%|fF.RES
+:TARGET..\target.exe
+:DEPENDENCY.
+.\test.obj
+.\vbmain.obj
+.\PgHndler.obj
+.\test.res
+:ACTION.Link::Linker
+:COMMAND.
+icc.exe @<<
+-DIC_TRACE_DEVELOP 
+ /Tdp 
+ /Gm /Gd 
+ /B" /de /st:64000 /pmtype:pm"
+ /Fetarget.exe 
+ .\test.obj
+ .\vbmain.obj
+ .\PgHndler.obj
+<<
+:ACTION.Bind::Resource Bind
+:COMMAND.
+rc.exe .\test.res target.exe
+:TARGET..\test.obj
+:DEPENDENCY.
+F:\toydev\pagehdl\test.cpp
+{F:\toydev\pagehdl;$(INCLUDE);}test.hpp
+{F:\toydev\pagehdl;$(INCLUDE);}test.h
+{F:\toydev\pagehdl;$(INCLUDE);}PgHndler.hpp
+{F:\toydev\pagehdl;$(INCLUDE);}PgHndler.h
+{F:\toydev\pagehdl;$(INCLUDE);}PgHndler.hpv
+:TARGET..\PgHndler.obj
+:DEPENDENCY.
+F:\toydev\pagehdl\PgHndler.cpp
+{F:\toydev\pagehdl;$(INCLUDE);}PgHndler.hpp
+{F:\toydev\pagehdl;$(INCLUDE);}PgHndler.cpv
+{F:\toydev\pagehdl;$(INCLUDE);}PgHndler.h
+{F:\toydev\pagehdl;$(INCLUDE);}PgHndler.hpv
+:TARGET..\vbmain.obj
+:DEPENDENCY.
+F:\toydev\pagehdl\vbmain.cpp
+{F:\toydev\pagehdl;$(INCLUDE);}test.hpp
+{F:\toydev\pagehdl;$(INCLUDE);}test.h
+:TARGET..\test.rc
+:DEPENDENCY.
+F:\toydev\pagehdl\test.rcx
+{$(INCLUDE)}test.rci
+:TARGET..\test.res
+:DEPENDENCY.
+.\test.rc
